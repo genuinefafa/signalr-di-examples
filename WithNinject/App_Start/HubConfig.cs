@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Hubs;
+using Microsoft.AspNet.SignalR.Infrastructure;
+using Ninject;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +15,13 @@ namespace WithNinject
     {
         public static void RegisterHubs(RouteCollection routes)
         {
-            GlobalHost.DependencyResolver.Register(typeof(TickHub), () => new TickHub(Tick.Tick.Instance));
-            routes.MapHubs();
+            var kernel = new StandardKernel();
+            var resolver = new NinjectSignalRDependencyResolver(kernel);
+
+            kernel.Bind<Tick.Tick>().To<Tick.Tick>().InSingletonScope();
+            kernel.Bind<IHubConnectionContext>().ToMethod(context => resolver.Resolve<IConnectionManager>().GetHubContext<TickHub>().Clients).WhenInjectedInto<Tick.Tick>();
+
+            routes.MapHubs(new HubConfiguration() { Resolver = resolver });
         }
     }
 }
