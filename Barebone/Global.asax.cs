@@ -20,6 +20,7 @@ namespace Barebone
 
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            HubConfig.RegisterHubs(RouteTable.Routes); // Must go before than MVC routes
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
